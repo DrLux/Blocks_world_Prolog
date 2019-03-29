@@ -18,21 +18,26 @@ finale(S):- goal(G), ord_subset(G,S).
 
 */
 % esempio Prof. Torasso
+block(x).
+block(y).
+block(z).
 block(a).
 block(b).
 block(c).
 block(d).
-block(e).
-block(f).
-block(g).
-block(h).
+block(ezio).
 
 
 iniziale(S):-
-	list_to_ord_set([clear(a), clear(c), clear(d), clear(e), clear(f), clear(g), clear(h), on(a,b), ontable(b), ontable(c), ontable(d), ontable(e), ontable(f), ontable(g), ontable(h), handempty],S).
+	list_to_ord_set([clear(a), on(a,b), on(b,c), ontable(c), handempty],S).
 
-goal(G):- list_to_ord_set([on(a,b),on(b,c),on(c,d),on(d,e),
-	ontable(e)],G).
+goal(G):- 
+	list_to_ord_set([clear(a), on(a,b), on(b,c), ontable(c), handempty],G).
 
 finale(S):- goal(G), ord_subset(G,S).
 
+wrapperino(X):-
+	list_to_ord_set([clear(x), on(x,z), on(z,a), on(a,b), on(b,c), ontable(c), ontable(d), clear(d),  handempty],S),
+	list_to_ord_set([clear(z), on(z,x), on(x,a), on(a,b), on(b,d), ontable(d), ontable(c), clear(c),  handempty],G),
+	mustBeMovedTwice(X,S,G).
+	
