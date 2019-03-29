@@ -37,7 +37,7 @@ goal(G):-
 finale(S):- goal(G), ord_subset(G,S).
 
 wrapperino(X):-
-	list_to_ord_set([clear(x), on(x,z), on(z,a), on(a,b), on(b,c), ontable(c), ontable(d), clear(d),  handempty],S),
-	list_to_ord_set([clear(z), on(z,x), on(x,a), on(a,b), on(b,d), ontable(d), ontable(c), clear(c),  handempty],G),
-	mustBeMovedTwice(X,S,G).
+	list_to_ord_set([clear(a), on(a,c), ontable(c), clear(b), on(b,d), ontable(d), handempty],S),
+	list_to_ord_set([clear(b), on(b,c), ontable(c), clear(a), on(a,d), ontable(d), handempty],G),
+	%goalPosition(X,S,G)
 	
