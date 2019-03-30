@@ -18,14 +18,14 @@ finale(S):- goal(G), ord_subset(G,S).
 
 */
 % esempio Prof. Torasso
-block(x).
-block(y).
-block(z).
+%block(x).
+%block(y).
+%block(z).
 block(a).
 block(b).
 block(c).
-block(d).
-block(ezio).
+%block(d).
+%block(ezio).
 
 
 iniziale(S):-
@@ -36,8 +36,9 @@ goal(G):-
 
 finale(S):- goal(G), ord_subset(G,S).
 
-wrapperino(X):-
+wrapperino(X,Y):-
 	list_to_ord_set([clear(a), on(a,c), ontable(c), clear(b), on(b,d), ontable(d), handempty],S),
 	list_to_ord_set([clear(b), on(b,c), ontable(c), clear(a), on(a,d), ontable(d), handempty],G),
-	%goalPosition(X,S,G)
+	mutualPrevention(X,Y,S,G).
+	%replaceOn(X,Y,S,SPP).
 	
