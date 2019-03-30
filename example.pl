@@ -24,7 +24,7 @@ finale(S):- goal(G), ord_subset(G,S).
 block(a).
 block(b).
 block(c).
-%block(d).
+block(d).
 %block(ezio).
 
 
@@ -37,8 +37,8 @@ goal(G):-
 finale(S):- goal(G), ord_subset(G,S).
 
 wrapperino(X,Y):-
-	list_to_ord_set([clear(a), on(a,c), ontable(c), clear(b), on(b,d), ontable(d), handempty],S),
-	list_to_ord_set([clear(b), on(b,c), ontable(c), clear(a), on(a,d), ontable(d), handempty],G),
+	list_to_ord_set([clear(a), on(a,b), on(b,c), ontable(c), handempty],S),
+	list_to_ord_set([clear(b), on(b,a), on(a,c), ontable(c), handempty],G),
 	mutualPrevention(X,Y,S,G).
 	%replaceOn(X,Y,S,SPP).
 	

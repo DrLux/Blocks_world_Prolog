@@ -70,13 +70,13 @@ goalPosition(X,S,G):-
 	ord_memberchk(on(X,Y),G),
 	goalPosition(Y,S,G).
 
-
 replaceOn(X,Y,S,SPP):-
 	block(Z),
 	X\=Z,
-	ord_memberchk(on(X,Z), S),!,
-	ord_del_element(S, on(X,Z), DLS),
-	ord_add_element(DLS, on(Y,Z), SPP).
+	ord_memberchk(on(X,Z),S),
+	ord_del_element(S,  on(X,Z), SP),
+	ord_add_element(SP, on(Y,Z), SPP).
+
  
 replaceOnTable(X,Y,S,SPP):-
 	ord_memberchk(ontable(X), S),!,
@@ -112,6 +112,7 @@ swapPreventionState(X,Y,S,FAKE_S):-
 	ord_memberchk(on(X,Z), TEMP_S),
 	ord_del_element(TEMP_S, on(X,Z), DLSS),
 	ord_add_element(DLSS, on(Y,Z), FAKE_S).
+
 
 
 swapPreventionState(X,Y,S,FAKE_S):-
