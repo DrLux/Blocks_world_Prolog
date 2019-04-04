@@ -18,14 +18,14 @@ finale(S):- goal(G), ord_subset(G,S).
 
 */
 % esempio Prof. Torasso
-block(x).
-block(y).
-block(z).
+%block(x).
+%block(y).
+%block(z).
 block(a).
 block(b).
 block(c).
 block(d).
-block(ezio).
+%block(ezio).
 
 
 iniziale(S):-
@@ -36,27 +36,8 @@ goal(G):-
 
 finale(S):- goal(G), ord_subset(G,S).
 
-wrapperino(X,Y):-
-	list_to_ord_set([clear(b), on(b,d), on(d,c), on(c,a), ontable(a),handempty],S),
-	list_to_ord_set([clear(a), on(a,d), on(d,c), on(c,b), ontable(b),handempty],S),
-	mutualPrevention(X,Y,S,G).
-
-/*
-%primo 
-list_to_ord_set([clear(a), on(a,b), ontable(b),handempty],S),
-list_to_ord_set([clear(b), on(b,a), ontable(a),handempty],G),
-
-%secondo
-list_to_ord_set([clear(a), on(a,c), on(c,b), ontable(b),handempty],S),
-list_to_ord_set([clear(b), on(b,c), on(c,a), ontable(a),handempty],G),
-
-%terzo
-list_to_ord_set([clear(a), on(a,b), on(b,c), ontable(c),handempty],S),
-list_to_ord_set([clear(b), on(b,a), on(a,c), ontable(c),handempty],G),
-
-%quarto
-list_to_ord_set([clear(b), on(b,d), on(d,c), on(c,a), ontable(a),handempty],S),
-list_to_ord_set([clear(a), on(a,d), on(d,c), on(c,b), ontable(b),handempty],S),
-
-
-*/
+wrapperino(Cost):-
+	list_to_ord_set([clear(a), on(a,b), on(b,d), on(d,c), ontable(c), handempty],S),
+	list_to_ord_set([clear(a), on(a,b), on(b,c), on(c,d), ontable(d), handempty],G),
+	%mutualPrevention(X,Y,S,G).
+	heuristic(S,G,Cost).

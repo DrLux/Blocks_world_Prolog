@@ -23,14 +23,26 @@ mustBeMovedOnce(X,S,G):-
 	ord_memberchk(on(X,Y),S),
 	ord_memberchk(on(X,Z),G).
 
+
+mustBeMovedOnce(X,S,G):-
+	block(X),
+	block(Y), 
+	X\=Y,
+	block(Z),
+	Y\=Z,
+	ord_memberchk(on(X,Y),S),
+	ord_memberchk(ontable(X),G).
+
+
+%in teoria non si può verificare
 mustBeMovedOnce(X,S,G):-
 	block(X),
 	block(Y),
 	X\=Y,
 	ord_memberchk(on(X,Y),G),
 	\+ord_memberchk(on(X,Y),S),
-	belowInStack(Y,X,S).
-
+	belowInStack(Y,X,S),
+	write("se leggi questo, controlla mustBeMovedOnce").
 
 
 mustBeMovedTwice(X,S,G):-
@@ -40,7 +52,6 @@ mustBeMovedTwice(X,S,G):-
 	ord_memberchk(on(X,Y),S),
 	ord_memberchk(on(X,Y),G),
 	mustBeMovedOnce(Y,S,G).
-
 
 mustBeMovedTwice(X,S,G):-
 	block(X),
@@ -124,4 +135,29 @@ replaceOnTable(X,Y,S,ST):-
 	ord_add_element(SP,ontable(Y),ST).
 
 replaceOnTable(_,_,S,S).
+
+
+%####################################
+heuristic(S,G,Cost):-
+    findall(X,block(X),BlockList),
+    computeCost(BlockList,S,G,Cost).
+
+computeCost([],_,_,Cost):- Cost is 0.
+
+computeCost([X|Tail],S,G,Cost):-
+	mustBeMovedTwice(X,S,G),!,
+	write('Twice: '),
+	write(X),
+	computeCost(Tail,S,G,TailCost),
+	Cost is TailCost + 4.
+
+computeCost([X|Tail],S,G,Cost):-
+	mustBeMovedOnce(X,S,G),!,
+	write('Once: '),
+	write(X),
+	computeCost(Tail,S,G,TailCost),
+	Cost is TailCost + 2.
+
+computeCost([_|Tail],S,G,Cost):-
+	computeCost(Tail,S,G,Cost).
 
