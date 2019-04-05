@@ -24,28 +24,28 @@ applicabile(unstack(X,Y),S):-
 	ord_memberchk(clear(X),S),
 	ord_memberchk(handempty,S).
 	
-trasforma(pickup(X),S1,S2):-
+trasforma(pickup(X),S1,S2,1):-
 	block(X),
 	list_to_ord_set([ontable(X),clear(X),handempty],DLS),
 	ord_subtract(S1,DLS,S),
 	list_to_ord_set([holding(X)],ALS),
 	ord_union(S,ALS,S2).
 	
-trasforma(putdown(X),S1,S2):-
+trasforma(putdown(X),S1,S2,1):-
 	block(X),
 	list_to_ord_set([holding(X)],DLS),
 	ord_subtract(S1,DLS,S),
 	list_to_ord_set([ontable(X),clear(X),handempty],ALS),
 	ord_union(S,ALS,S2).
 
-trasforma(stack(X,Y),S1,S2):-
+trasforma(stack(X,Y),S1,S2,1):-
 	block(X), block(Y), X\=Y,
 	list_to_ord_set([holding(X),clear(Y)],DLS),
 	ord_subtract(S1,DLS,S),
 	list_to_ord_set([on(X,Y),clear(X),handempty],ALS),
 	ord_union(S,ALS,S2).
 
-trasforma(unstack(X,Y),S1,S2):-
+trasforma(unstack(X,Y),S1,S2,1):-
 	block(X), block(Y), X\=Y,
 	list_to_ord_set([on(X,Y),clear(X),handempty],DLS),
 	ord_subtract(S1,DLS,S),

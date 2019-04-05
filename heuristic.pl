@@ -140,24 +140,30 @@ replaceOnTable(_,_,S,S).
 %####################################
 heuristic(S,G,Cost):-
     findall(X,block(X),BlockList),
-    computeCost(BlockList,S,G,Cost).
+ 	computeCost(BlockList,S,G,Cost).
 
-computeCost([],_,_,Cost):- Cost is 0.
+computeCost([],_,_,0).
 
 computeCost([X|Tail],S,G,Cost):-
+	%write("compute 2 inizio "),
 	mustBeMovedTwice(X,S,G),!,
-	write('Twice: '),
-	write(X),
+	%write('Twice: '),
+	%write(X),
 	computeCost(Tail,S,G,TailCost),
 	Cost is TailCost + 4.
+	%write("compute 2 fine ").
 
 computeCost([X|Tail],S,G,Cost):-
+	%write("compute 3 inizio "),
 	mustBeMovedOnce(X,S,G),!,
-	write('Once: '),
-	write(X),
+	%write('Once: '),
+	%write(X),
 	computeCost(Tail,S,G,TailCost),
 	Cost is TailCost + 2.
+	%write("compute 3 fine ").
 
 computeCost([_|Tail],S,G,Cost):-
+	%write("compute 4 inizio "),
 	computeCost(Tail,S,G,Cost).
+	%write("compute 4 fine ").
 
