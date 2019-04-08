@@ -6,6 +6,7 @@ bfs(Soluzione):-
 % Coda = [nodo(S,Azioni)|...]
 
 bfs_aux([nodo(S,Azioni)|_],_,Azioni):-finale(S),!.
+
 bfs_aux([nodo(S,Azioni)|Tail],Visitati,Soluzione):-
     findall(Azione,applicabile(Azione,S),ListaApplicabili),
     generaFigli(nodo(S,Azioni),ListaApplicabili,[S|Visitati],ListaFigli),
@@ -17,6 +18,7 @@ generaFigli(nodo(S,AzioniPerS),[Azione|AltreAzioni],Visitati,[nodo(SNuovo,[Azion
     trasforma(Azione,S,SNuovo),
     \+member(SNuovo,Visitati),!,
     generaFigli(nodo(S,AzioniPerS),AltreAzioni,Visitati,FigliTail).
+    
 generaFigli(nodo(S,AzioniPerS),[_|AltreAzioni],Visitati,FigliTail):-
     generaFigli(nodo(S,AzioniPerS),AltreAzioni,Visitati,FigliTail).
 
