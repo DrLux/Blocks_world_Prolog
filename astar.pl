@@ -1,78 +1,80 @@
-astar(Soluzione):-
+astar(Solution):-
     iniziale(S),
-    astar_aux([nodo(S,[],0,0)],[],Soluzione).
+    write("\nstato iniziale:\n"),
+    write(S),
+    write("\nstato finale:\n"),
+    goal(G),
+    write(G),
+    astar_aux([node(S,[],0,0)],[],Sol),
+    reverse(Sol,Solution).
 
-% astar_aux(Coda,Visitati,Soluzione)
-% Coda = [nodo(S,Azioni,G,H)|...]
+% astar_aux(Coda,ClosedList,Soluzione)
+% Coda = [node(S,Azioni,G,H)|...]
 
-astar_aux([nodo(S,Azioni,_,_)|_],_,Azioni):-finale(S),!.
+astar_aux([node(S,ActionsToS,_,_)|_],_,ActionsToS):-finale(S),!.
 
-astar_aux([nodo(S,Azioni,G,H)|PriorityQueue],Visitati,Soluzione):-
-    findall(Azione,applicabile(Azione,S),ListaApplicabili),
-    expandChildren(nodo(S,Azioni,G,H),ListaApplicabili,PriorityQueue,[nodo(S,Azioni,G,H)|Visitati],PriorityQueueUpdated,VisitatiUpdated),
-    astar_aux(PriorityQueueUpdated,VisitatiUpdated,Soluzione).
+astar_aux([node(S,ActionsToS,G,H)|OpenTail],ClosedList,Solution):-
+    findall(Action,applicable(Action,S),ApplicableActionsList),
+    generateChildren(node(S,ActionsToS,G,H),ApplicableActionsList,OpenTail,[node(S,ActionsToS,G,H)|ClosedList],UpdatedOpenList,UpdatedClosedList),
+    astar_aux(UpdatedOpenList,UpdatedClosedList,Solution).
 
-expandChildren(_,[],PriorityQueue,Visitati,PriorityQueue,Visitati).
 
-%When node is already in PriorityQueue 
-expandChildren(nodo(S,AzioniPerS,G,H),[AzioneApplicabile|AltreAzioni],PriorityQueue,Visitati,PriorityQueueUpdated,VisitatiUpdated):-
-    trasforma(AzioneApplicabile,S,SNuovo,ActionCost),
-    member(nodo(SNuovo,OldAzioni,OldG,OldH),PriorityQueue),!,
+
+generateChildren(_,[],OpenList,ClosedList,OpenList,ClosedList).
+
+%When node is already in OpenList 
+generateChildren(node(S,ActionsToS,G,H),[ApplicableAction|OtherActions],OpenList,ClosedList,UpdatedOpenList,UpdatedClosedList):-
+    transform(ApplicableAction,S,NewS),
+    member(node(NewS,OldActions,OldG,OldH),OpenList),!,
+    actionCost(ApplicableAction,ActionCost),
     NewG is G + ActionCost,
-    updateInPriorityQueue(nodo(SNuovo,OldAzioni,OldG,OldH),nodo(SNuovo,[AzioneApplicabile|AzioniPerS],NewG,OldH),PriorityQueue,NewPriorityQueue),
-    expandChildren(nodo(S,AzioniPerS,G,H),AltreAzioni,NewPriorityQueue,Visitati,PriorityQueueUpdated,VisitatiUpdated).
+    updateOpenList(node(NewS,OldActions,OldG,OldH),node(NewS,[ApplicableAction|ActionsToS],NewG,OldH),OpenList,NewOpenList),
+    generateChildren(node(S,ActionsToS,G,H),OtherActions,NewOpenList,ClosedList,UpdatedOpenList,UpdatedClosedList).
 
-
-%When node is already in Visitati
-expandChildren(nodo(S,AzioniPerS,G,H),[AzioneApplicabile|AltreAzioni],PriorityQueue,Visitati,PriorityQueueUpdated,VisitatiUpdated):-
-    trasforma(AzioneApplicabile,S,SNuovo,ActionCost),
-    member(nodo(SNuovo,OldAzioni,OldG,OldH),Visitati),!,
-    %write("\n Nodo "),
-    %write(nodo(SNuovo,OldAzioni,OldG,OldH)),
-    %write("\n Visitati "),
-    %write(Visitati),
+%When node is already in ClosedList
+generateChildren(node(S,ActionsToS,G,H),[ApplicableAction|OtherActions],OpenList,ClosedList,UpdatedOpenList,UpdatedClosedList):-
+    transform(ApplicableAction,S,NewS),
+    member(node(NewS,OldActions,OldG,OldH),ClosedList),!,
+    actionCost(ApplicableAction,ActionCost),
     NewG is G + ActionCost,
-    insertInVisitati(nodo(SNuovo,OldAzioni,OldG,OldH),nodo(SNuovo,[AzioneApplicabile|AzioniPerS],NewG,OldH),PriorityQueue,Visitati,NewPriorityQueue,NewVisitati),
-    expandChildren(nodo(S,AzioniPerS,G,H),AltreAzioni,NewPriorityQueue,NewVisitati,PriorityQueueUpdated,VisitatiUpdated).
+    updateClosedList(node(NewS,OldActions,OldG,OldH),node(NewS,[ApplicableAction|ActionsToS],NewG,OldH),OpenList,ClosedList,NewOpenList,NewClosedList),
+    generateChildren(node(S,ActionsToS,G,H),OtherActions,NewOpenList,NewClosedList,UpdatedOpenList,UpdatedClosedList).
 
 
-%When node is not in PriorityQueue nor in Visitati
-expandChildren(nodo(S,AzioniPerS,G,H),[AzioneApplicabile|AltreAzioni],PriorityQueue,Visitati,PriorityQueueUpdated,VisitatiUpdated):-
-    trasforma(AzioneApplicabile,S,SNuovo,ActionCost),
-    %write(" in entrambi"),
+%When node is not in OpenList nor in ClosedList
+generateChildren(node(S,ActionsToS,G,H),[ApplicableAction|OtherActions],OpenList,ClosedList,UpdatedOpenList,UpdatedClosedList):-
+    transform(ApplicableAction,S,NewS),
+    actionCost(ApplicableAction,ActionCost),
     NewG is G + ActionCost,
     goal(Goal),
-    heuristic(SNuovo,Goal,NewH),
-    %write(PriorityQueue),
-    ordInsert(PriorityQueue,nodo(SNuovo,[AzioneApplicabile|AzioniPerS],NewG,NewH),NewPriorityQueue),
-    expandChildren(nodo(S,AzioniPerS,G,H),AltreAzioni,NewPriorityQueue,Visitati,PriorityQueueUpdated,VisitatiUpdated).
+    heuristic(NewS,Goal,NewH),
+    orderedInsertNode(OpenList,node(NewS,[ApplicableAction|ActionsToS],NewG,NewH),NewOpenList),
+    generateChildren(node(S,ActionsToS,G,H),OtherActions,NewOpenList,ClosedList,UpdatedOpenList,UpdatedClosedList).
 
-updateInPriorityQueue(nodo(SNuovo,OldAzioni,OldG,OldH),nodo(SNuovo,NewAzioni,NewG,_),PriorityQueue,NewPriorityQueue):-
+
+
+updateOpenList(node(NewS,OldActions,OldG,OldH),node(NewS,NewActions,NewG,_),OpenList,NewOpenList):-
     NewG < OldG,!,
-    delete(PriorityQueue,nodo(SNuovo,OldAzioni,OldG,OldH),PQR),
-    ordInsert(PQR,nodo(SNuovo,NewAzioni,NewG,OldH),NewPriorityQueue).
+    delete(OpenList,node(NewS,OldActions,OldG,OldH),PQR),
+    orderedInsertNode(PQR,node(NewS,NewActions,NewG,OldH),NewOpenList).
 
-updateInPriorityQueue(_,_,PriorityQueue,PriorityQueue).
+updateOpenList(_,_,OpenList,OpenList).
 
-insertInVisitati(nodo(SNuovo,OldAzioni,OldG,OldH),nodo(SNuovo,NewAzioni,NewG,OldH),PriorityQueue,Visitati,NewPriorityQueue,NewVisitati):-
-    %write('NewG '),
-    %write(NewG),
-    %write(' OldG '),
-    %write(OldG),
+
+updateClosedList(node(NewS,OldActions,OldG,OldH),node(NewS,NewActions,NewG,OldH),OpenList,ClosedList,NewOpenList,NewClosedList):-
     NewG < OldG,!,
-    delete(Visitati,nodo(SNuovo,OldAzioni,OldG,OldH),NewVisitati),
-    ordInsert(PriorityQueue,nodo(SNuovo,NewAzioni,NewG,OldH),NewPriorityQueue).
+    delete(ClosedList,node(NewS,OldActions,OldG,OldH),NewClosedList),
+    orderedInsertNode(OpenList,node(NewS,NewActions,NewG,OldH),NewOpenList).
 
-insertInVisitati(_,_,PriorityQueue,Visitati,PriorityQueue,Visitati).
+updateClosedList(_,_,OpenList,ClosedList,OpenList,ClosedList).
 
 
-ordInsert([],nodo(SP,AzioniP,GP,HP),[nodo(SP,AzioniP,GP,HP)]).
-%ordInsert([],X,[X]).
+orderedInsertNode([],node(S,A,G,H),[node(S,A,G,H)]).
 
-ordInsert([nodo(_,_,G,H)|Tail],nodo(SP,AzioniP,GP,HP),NuovaLista):-
+orderedInsertNode([node(S,A,G,H)|Tail],node(SP,AP,GP,HP),[node(S,A,G,H)|NewTail]):-
     F is G + H,
     FP is GP + HP,
     F < FP,!,
-    ordInsert(Tail,nodo(SP,AzioniP,GP,HP),NuovaLista).
+    orderedInsertNode(Tail,node(SP,AP,GP,HP),NewTail).
 
-ordInsert(Lista,nodo(SP,AzioniP,GP,HP),[nodo(SP,AzioniP,GP,HP)|Lista]).
+orderedInsertNode(List,node(S,A,G,H),[node(S,A,G,H)|List]).
