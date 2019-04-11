@@ -1,58 +1,76 @@
-astar(Solution):-
+
+idastar(MaxLimit,Step,Solution):-
+	idastar_aux(1,MaxLimit,Step,Solution).
+
+idastar_aux(Limit,_,_,Solution):-
+	limited_astar(Limit,Solution),!.
+
+idastar_aux(Limit,MaxLimit,Step,Solution):-
+	Limit<MaxLimit,
+	NewLimit is Limit+Step,
+	idastar_aux(NewLimit,MaxLimit,Step,Solution).
+
+	
+limited_astar(Limit,Solution):-
     initial(S),
     write("\nstato initial:\n"),
     write(S),
     write("\nstato final:\n"),
     goal(G),
     write(G),
-    astar_aux([node(S,[],0,0)],[],Sol),
+    limited_astar_aux([node(S,[],0,0)],[],Limit,Sol),
     reverse(Sol,Solution).
 
-% astar_aux(Coda,ClosedList,Soluzione)
+% limited_astar_aux(Coda,ClosedList,Soluzione)
 % Coda = [node(S,Azioni,G,H)|...]
 
-astar_aux([node(S,ActionsToS,G,_)|_],_,ActionsToS):-
+limited_astar_aux([node(S,ActionsToS,G,_)|_],_,_,ActionsToS):-
     final(S),!,
     write("\nCost Solution: "),
     write(G),
     write("\n").
-    
 
-astar_aux([node(S,ActionsToS,G,H)|OpenTail],ClosedList,Solution):-
+limited_astar_aux([node(S,ActionsToS,G,H)|OpenTail],ClosedList,Limit,Solution):-
     findall(Action,applicable(Action,S),ApplicableActionsList),
-    generateChildren(node(S,ActionsToS,G,H),ApplicableActionsList,OpenTail,[node(S,ActionsToS,G,H)|ClosedList],UpdatedOpenList,UpdatedClosedList),
-    astar_aux(UpdatedOpenList,UpdatedClosedList,Solution).
+    generateChildren(node(S,ActionsToS,G,H),ApplicableActionsList,Limit,OpenTail,[node(S,ActionsToS,G,H)|ClosedList],UpdatedOpenList,UpdatedClosedList),
+    limited_astar_aux(UpdatedOpenList,UpdatedClosedList,Limit,Solution).
 
 
-generateChildren(_,[],OpenList,ClosedList,OpenList,ClosedList).
+generateChildren(_,[],_,OpenList,ClosedList,OpenList,ClosedList).
 
 %When node is already in OpenList 
-generateChildren(node(S,ActionsToS,G,H),[ApplicableAction|OtherActions],OpenList,ClosedList,UpdatedOpenList,UpdatedClosedList):-
+generateChildren(node(S,ActionsToS,G,H),[ApplicableAction|OtherActions],Limit,OpenList,ClosedList,UpdatedOpenList,UpdatedClosedList):-
     transform(ApplicableAction,S,NewS),
     member(node(NewS,OldActions,OldG,OldH),OpenList),!,
     getActionCost(ApplicableAction,ActionCost),
     NewG is G + ActionCost,
     updateOpenList(node(NewS,OldActions,OldG,OldH),node(NewS,[ApplicableAction|ActionsToS],NewG,OldH),OpenList,NewOpenList),
-    generateChildren(node(S,ActionsToS,G,H),OtherActions,NewOpenList,ClosedList,UpdatedOpenList,UpdatedClosedList).
+    generateChildren(node(S,ActionsToS,G,H),OtherActions,Limit,NewOpenList,ClosedList,UpdatedOpenList,UpdatedClosedList).
 
 %When node is already in ClosedList
-generateChildren(node(S,ActionsToS,G,H),[ApplicableAction|OtherActions],OpenList,ClosedList,UpdatedOpenList,UpdatedClosedList):-
+generateChildren(node(S,ActionsToS,G,H),[ApplicableAction|OtherActions],Limit,OpenList,ClosedList,UpdatedOpenList,UpdatedClosedList):-
     transform(ApplicableAction,S,NewS),
     member(node(NewS,OldActions,OldG,OldH),ClosedList),!,
     getActionCost(ApplicableAction,ActionCost),
     NewG is G + ActionCost,
     updateClosedList(node(NewS,OldActions,OldG,OldH),node(NewS,[ApplicableAction|ActionsToS],NewG,OldH),OpenList,ClosedList,NewOpenList,NewClosedList),
-    generateChildren(node(S,ActionsToS,G,H),OtherActions,NewOpenList,NewClosedList,UpdatedOpenList,UpdatedClosedList).
+    generateChildren(node(S,ActionsToS,G,H),OtherActions,Limit,NewOpenList,NewClosedList,UpdatedOpenList,UpdatedClosedList).
 
 %When node is not in OpenList nor in ClosedList
-generateChildren(node(S,ActionsToS,G,H),[ApplicableAction|OtherActions],OpenList,ClosedList,UpdatedOpenList,UpdatedClosedList):-
+generateChildren(node(S,ActionsToS,G,H),[ApplicableAction|OtherActions],Limit,OpenList,ClosedList,UpdatedOpenList,UpdatedClosedList):-
     transform(ApplicableAction,S,NewS),
     getActionCost(ApplicableAction,ActionCost),
     NewG is G + ActionCost,
     goal(Goal),
     heuristic(NewS,Goal,NewH),
+    NewG + NewH =< Limit,!,
     orderedInsertNode(OpenList,node(NewS,[ApplicableAction|ActionsToS],NewG,NewH),NewOpenList),
-    generateChildren(node(S,ActionsToS,G,H),OtherActions,NewOpenList,ClosedList,UpdatedOpenList,UpdatedClosedList).
+    generateChildren(node(S,ActionsToS,G,H),OtherActions,Limit,NewOpenList,ClosedList,UpdatedOpenList,UpdatedClosedList).
+    
+%When one node exceded limit    
+generateChildren(node(S,ActionsToS,G,H),[_|OtherActions],Limit,OpenList,ClosedList,UpdatedOpenList,UpdatedClosedList):-
+    generateChildren(node(S,ActionsToS,G,H),OtherActions,Limit,OpenList,ClosedList,UpdatedOpenList,UpdatedClosedList).
+
 
 
 getActionCost(Action,Cost):-actionCost(Action,Cost).

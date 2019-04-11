@@ -1,26 +1,26 @@
-% dfs_aux(S,ListaAzioni,Visitati,Soglia)
+% ldfs_aux(S,ListaAzioni,Visited,Limit)
 
-idfs(Soluzione,SogliaMax,Step):-
-	idfs_aux(Soluzione,1,SogliaMax,Step).
+idfs(MaxLimit,Step,Solution):-
+	idfs_aux(1,MaxLimit,Step,Solution).
 
-idfs_aux(Soluzione,Soglia,_,_):-
-	depth_limit_search(Soluzione,Soglia),!.
+idfs_aux(Limit,_,_,Solution):-
+	limited_depth_first_search(Limit,Solution),!.
 
-idfs_aux(Soluzione,Soglia,SogliaMax,Step):-
-	Soglia<SogliaMax,
-	Sogliap is Soglia+Step,
-	idfs_aux(Soluzione,Sogliap,SogliaMax,Step).
+idfs_aux(Limit,MaxLimit,Step,Solution):-
+	Limit<MaxLimit,
+	NewLimit is Limit+Step,
+	idfs_aux(NewLimit,MaxLimit,Step,Solution).
 
 
-depth_limit_search(Soluzione,Soglia):-
-    iniziale(S),
-    dfs_aux(S,Soluzione,[S],Soglia).
+limited_depth_first_search(Limit,Solution):-
+    initial(S),
+    ldfs_aux(S,[S],Limit,Solution).
 
-dfs_aux(S,[],_,_):-finale(S).
-dfs_aux(S,[Azione|AzioniTail],Visitati,Soglia):-
-    Soglia>0,
-    applicabile(Azione,S),
-    trasforma(Azione,S,SNuovo),
-    \+member(SNuovo,Visitati),
-    NuovaSoglia is Soglia-1,
-    dfs_aux(SNuovo,AzioniTail,[SNuovo|Visitati],NuovaSoglia).
+ldfs_aux(S,_,_,[]):-final(S).
+ldfs_aux(S,Visited,Limit,[Action|ActionsTail]):-
+    Limit>0,
+    applicable(Action,S),
+    trasform(Action,S,NewS),
+    \+member(NewS,Visited),
+    DecrementedLimit is Limit-1,
+    ldfs_aux(NewS,[NewS|Visited],DecrementedLimit,ActionsTail).
