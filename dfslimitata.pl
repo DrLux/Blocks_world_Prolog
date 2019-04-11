@@ -17,6 +17,7 @@ limited_depth_first_search(Limit,Solution):-
     ldfs_aux(S,[S],Limit,Solution).
 
 ldfs_aux(S,_,_,[]):-final(S).
+
 ldfs_aux(S,Visited,Limit,[Action|ActionsTail]):-
     Limit>0,
     applicable(Action,S),
