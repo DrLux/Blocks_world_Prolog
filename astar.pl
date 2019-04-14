@@ -26,7 +26,7 @@ astar_aux([node(S,ActionsToS,G,H)|OpenTail],ClosedList,Solution):-
 
 generateChildren(_,[],OpenList,ClosedList,OpenList,ClosedList).
 
-%When node is already in OpenList 
+% When node is already in OpenList 
 generateChildren(node(S,ActionsToS,G,H),[ApplicableAction|OtherActions],OpenList,ClosedList,UpdatedOpenList,UpdatedClosedList):-
     transform(ApplicableAction,S,NewS),
     member(node(NewS,OldActions,OldG,OldH),OpenList),!,
@@ -35,7 +35,7 @@ generateChildren(node(S,ActionsToS,G,H),[ApplicableAction|OtherActions],OpenList
     updateOpenList(node(NewS,OldActions,OldG,OldH),node(NewS,[ApplicableAction|ActionsToS],NewG,OldH),OpenList,NewOpenList),
     generateChildren(node(S,ActionsToS,G,H),OtherActions,NewOpenList,ClosedList,UpdatedOpenList,UpdatedClosedList).
 
-%When node is already in ClosedList
+% When node is already in ClosedList
 generateChildren(node(S,ActionsToS,G,H),[ApplicableAction|OtherActions],OpenList,ClosedList,UpdatedOpenList,UpdatedClosedList):-
     transform(ApplicableAction,S,NewS),
     member(node(NewS,OldActions,OldG,OldH),ClosedList),!,
@@ -44,7 +44,7 @@ generateChildren(node(S,ActionsToS,G,H),[ApplicableAction|OtherActions],OpenList
     updateClosedList(node(NewS,OldActions,OldG,OldH),node(NewS,[ApplicableAction|ActionsToS],NewG,OldH),OpenList,ClosedList,NewOpenList,NewClosedList),
     generateChildren(node(S,ActionsToS,G,H),OtherActions,NewOpenList,NewClosedList,UpdatedOpenList,UpdatedClosedList).
 
-%When node is not in OpenList nor in ClosedList
+% When node is not in OpenList nor in ClosedList
 generateChildren(node(S,ActionsToS,G,H),[ApplicableAction|OtherActions],OpenList,ClosedList,UpdatedOpenList,UpdatedClosedList):-
     transform(ApplicableAction,S,NewS),
     getActionCost(ApplicableAction,ActionCost),

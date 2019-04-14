@@ -1,91 +1,70 @@
-belowInStack(X,Y,S):- 
-	block(X),
-	block(Y),
-	X\=Y,
-	ord_memberchk(on(Y,X),S).
+% General note: if a block variable is known to be already instantiated when a membership
+% test occour, then is more convenient to use ord_memberchk.
+% Otherwise, if we search for something that has a known pattern but at least one unknown
+% variable, it is useful to use member to immediately find the correct substitution (if any).
+% Aee example below:
 
 belowInStack(X,Y,S):- 
-	block(X),
-	block(Y),
-	X\=Y,
-	block(Z),
-	Z\=X,
-	Z\=Y,
-	ord_memberchk(on(Y,Z),S),
+	ord_memberchk(on(Y,X),S). %example: here X and Y are known: use ord_memberchk
+
+belowInStack(X,Y,S):- 
+	member(on(Y,Z),S),  % here we only know the pattern, but we do not know Z: use member
 	belowInStack(X,Z,S).
 
-mustBeMovedOnce(X,S,G):-
-	block(X),
-	block(Y), 
-	X\=Y,
-	block(Z),
-	Y\=Z,
-	ord_memberchk(on(X,Y),S),
-	ord_memberchk(on(X,Z),G).
-
 
 mustBeMovedOnce(X,S,G):-
-	block(X),
-	block(Y), 
-	X\=Y,
-	block(Z),
-	Y\=Z,
-	ord_memberchk(on(X,Y),S),
-	ord_memberchk(ontable(X),G).
+	member(on(X,Y),S),
+	member(on(X,Z),G),
+	Y\=Z.
 
-
-%in teoria non si può verificare
 mustBeMovedOnce(X,S,G):-
-	block(X),
-	block(Y),
-	X\=Y,
-	ord_memberchk(on(X,Y),G),
+	ord_memberchk(ontable(X),G),
+	member(on(X,_),S).
+
+mustBeMovedOnce(X,S,G):-
+	ord_memberchk(ontable(X),S),   
+	member(on(X,_),G).
+
+% In theory, this case should never be reached
+mustBeMovedOnce(X,S,G):-
+	member(on(X,Y),G),
 	\+ord_memberchk(on(X,Y),S),
 	belowInStack(Y,X,S),
-	write("se leggi questo, controlla mustBeMovedOnce").
+	write("\n!!!!!! - If you read this, check mustBeMovedOnce\n").
 
 
 mustBeMovedTwice(X,S,G):-
-	block(X),
-	block(Y),
-	X\=Y,
-	ord_memberchk(on(X,Y),S),
+	member(on(X,Y),S),
 	ord_memberchk(on(X,Y),G),
 	mustBeMovedOnce(Y,S,G).
 
 mustBeMovedTwice(X,S,G):-
-	block(X),
 	block(Y),
 	X\=Y,
 	belowInStack(Y,X,S),
 	mustBeMovedTwice(Y,S,G).
 
-%GoalPosition(A) = se la seguenza da A a Table è uguale in S e in G
 
+% goalPosition(A) = true if the block sequence from A to Table is the same in S and G
 goalPosition(X,S,G):-
-	block(X),
 	ord_memberchk(ontable(X),G),
 	ord_memberchk(ontable(X),S).
 
 goalPosition(X,S,G):-
-	block(X),
-	block(Y),
-	X\=Y,
-	ord_memberchk(on(X,Y),G),
+	member(on(X,Y),G),
 	ord_memberchk(on(X,Y),S),
 	goalPosition(Y,S,G).
 
 
-%mutualPrevention = se sviluppo A e B, sia A che B sono in GoalPosition (nello stato fittizio S* dove ho cambiato A e B rimuovendo predicati e reinserendoli al contrario)
+% mutualPrevention(A,B) = if A and B are swapped, both reach their goal positions (tested in a fake state)
 mutualPrevention(X,Y,S,G):-
-	block(X),
-	block(Y),
-	X\=Y,
-	swapPreventionState(X,Y,S,FAKE_S),
+    %ord_memberchk(clear(X),S),
+    %ord_memberchk(clear(Y),S),
+	swapBlocks(X,Y,S,FAKE_S),
 	goalPosition(X,FAKE_S,G),
 	goalPosition(Y,FAKE_S,G).
 
-swapPreventionState(X,Y,S,FAKE_S):-
+swapBlocks(X,Y,S,FAKE_S):-
 	replaceBlock(X,Y,S,SP),
 	replaceBlock(Y,X,S,SPP),
 	ord_union(SP, SPP, FAKE_S).
@@ -97,37 +76,33 @@ replaceBlock(X,Y,S,SP):-
 	replaceOnTable(X,Y,FAKE_S,SP).
 
 
-replaceAbove(X,Y,S,SPP):- %nel caso in cui abbia qualcosa diverso da Y sopra di X
-	block(Z),
-	x\=Z,
-	ord_memberchk(on(Z,X),S),
+replaceAbove(X,Y,S,SPP):- % if there is a block that is not Y above X
+	member(on(Z,X),S),
 	Y\=Z,!, 
 	ord_del_element(S,on(Z,X),SP),
 	ord_add_element(SP,on(Z,Y),SPP).
 
-replaceAbove(X,Y,S,SPP):- %nel caso in cui abbia Y sopra X
+replaceAbove(X,Y,S,SPP):- % if block Y is above X
 	ord_memberchk(on(Y,X),S),!,
 	ord_del_element(S,on(Y,X),SP),
 	ord_add_element(SP,on(X,Y),SPP).
 
+replaceAbove(_,_,S,S). % if there is no block above X
 
-replaceAbove(_,_,S,S). % nel caso in cui non ci sia nulla sopra X
 
-replaceBelow(X,Y,S,SPP):- %nel caso in cui abbia qualcosa diverso da Y sotto di X
-	block(Z),
-	x\=Z,
-	ord_memberchk(on(X,Z),S),
+replaceBelow(X,Y,S,SPP):-  % if there is a block that is not Y below X
+	member(on(X,Z),S),
 	Y\=Z,!, 
 	ord_del_element(S,on(X,Z),SP),
 	ord_add_element(SP,on(Y,Z),SPP).
 
-replaceBelow(X,Y,S,SPP):- %nel caso in cui abbia Y sotto X
+replaceBelow(X,Y,S,SPP):- % if block Y is below X
 	ord_memberchk(on(X,Y),S),!,
 	ord_del_element(S,on(X,Y),SP),
 	ord_add_element(SP,on(Y,X),SPP).
 
+replaceBelow(_,_,S,S). % if there is no block below X
 
-replaceBelow(_,_,S,S). % nel caso in cui non ci sia nulla sotto X
 
 replaceOnTable(X,Y,S,ST):-
 	ord_memberchk(ontable(X),S),!,
@@ -138,6 +113,8 @@ replaceOnTable(_,_,S,S).
 
 
 %####################################
+
+
 heuristic(S,G,Cost):-
     findall(X,block(X),BlockList),
  	computeCost(BlockList,S,G,Cost).
@@ -145,25 +122,15 @@ heuristic(S,G,Cost):-
 computeCost([],_,_,0).
 
 computeCost([X|Tail],S,G,Cost):-
-	%write("compute 2 inizio "),
 	mustBeMovedTwice(X,S,G),!,
-	%write('Twice: '),
-	%write(X),
 	computeCost(Tail,S,G,TailCost),
-	Cost is TailCost + 4.
-	%write("compute 2 fine ").
+	Cost is TailCost + 4. % if block movement consist of two phases, pickup & putdown (2 if only direct move actions are present)
 
 computeCost([X|Tail],S,G,Cost):-
-	%write("compute 3 inizio "),
 	mustBeMovedOnce(X,S,G),!,
-	%write('Once: '),
-	%write(X),
 	computeCost(Tail,S,G,TailCost),
-	Cost is TailCost + 2.
-	%write("compute 3 fine ").
+	Cost is TailCost + 2. % if block movement consist of two phases, pickup & putdown (1 if only direct move actions are present)
 
 computeCost([_|Tail],S,G,Cost):-
-	%write("compute 4 inizio "),
 	computeCost(Tail,S,G,Cost).
-	%write("compute 4 fine ").
 

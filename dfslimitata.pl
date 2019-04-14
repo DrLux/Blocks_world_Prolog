@@ -21,7 +21,7 @@ ldfs_aux(S,_,_,[]):-final(S).
 ldfs_aux(S,Visited,Limit,[Action|ActionsTail]):-
     Limit>0,
     applicable(Action,S),
-    trasform(Action,S,NewS),
+    transform(Action,S,NewS),
     \+member(NewS,Visited),
     DecrementedLimit is Limit-1,
     ldfs_aux(NewS,[NewS|Visited],DecrementedLimit,ActionsTail).

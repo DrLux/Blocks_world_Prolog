@@ -9,6 +9,7 @@ actionCost(unstack(_,_),1).
 
 %%%%%%%% TEST 1 %%%%%%%%
 
+
 block(a).
 block(b).
 block(c).
@@ -29,8 +30,8 @@ final(S):- goal(G), ord_subset(G,S).
 
 %%%%%% TEST 2 %%%%%%%
 
-/*
 
+/*
 % esempio Prof. Torasso
 %block(x).
 %block(y).
@@ -48,15 +49,15 @@ goal(G):-
 	list_to_ord_set([clear(b), on(b,c), on(c,d), ontable(d), handempty],G).
 
 final(S):- goal(G), ord_subset(G,S).
-
 */
+
 
 
 
 %%%%%%%% TEST 3 %%%%%%%%%% 
 
-/*
 
+/*
 block(a).
 block(b).
 %block(ezio).
@@ -68,17 +69,13 @@ goal(G):-
 	list_to_ord_set([clear(b), on(b,a), ontable(a), handempty],G).
 
 final(S):- goal(G), ord_subset(G,S).
-
 */
 
 
 
 
-/*
-
-wrapperino(Cost):-
+wrapperino(X,Y):-
 	list_to_ord_set([clear(a), on(a,b), on(b,d), on(d,c), ontable(c), handempty],S),
 	list_to_ord_set([clear(a), on(a,b), on(b,c), on(c,d), ontable(d), handempty],G),
-	heuristic(S,G,Cost).
+	belowInStack(X,Y,S).
 	
-*/
