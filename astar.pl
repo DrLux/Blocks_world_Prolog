@@ -75,7 +75,7 @@ updateClosedList(node(NewS,OldActions,OldG,OldH),node(NewS,NewActions,NewG,OldH)
 updateClosedList(_,_,OpenList,ClosedList,OpenList,ClosedList).
 
 
-orderedInsertNode([],node(S,A,G,H),[node(S,A,G,H)]).
+orderedInsertNode([],Node,[Node]).
 
 orderedInsertNode([node(S,A,G,H)|Tail],node(SP,AP,GP,HP),[node(S,A,G,H)|NewTail]):-
     F is G + H,
@@ -83,4 +83,4 @@ orderedInsertNode([node(S,A,G,H)|Tail],node(SP,AP,GP,HP),[node(S,A,G,H)|NewTail]
     F < FP,!,
     orderedInsertNode(Tail,node(SP,AP,GP,HP),NewTail).
 
-orderedInsertNode(List,node(S,A,G,H),[node(S,A,G,H)|List]).
+orderedInsertNode(List,Node,[Node|List]).

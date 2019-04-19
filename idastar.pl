@@ -17,6 +17,9 @@ idastar_choice(FMin,Solution,Solution):-
 % if not, retry with a greater max f-value (FMin)
 idastar_choice(FMin,_,Solution):-
     FMin < 999999,
+    write("retry:  "),
+    write(FMin),
+    write("\n"),
     idastar_aux(FMin,Solution).
     
 % f-limited depth first search 
@@ -85,7 +88,7 @@ exploreMoreCheck(OtherChildren,Visited,FLimit,FMinIn,_,FMin,Solution):-
     FMin is min(FMinIn,FMinSibling).
 
 
-orderedInsertNode([],node(S,A,G,H),[node(S,A,G,H)]).
+orderedInsertNode([],Node,[Node]).
 
 orderedInsertNode([node(S,A,G,H)|Tail],node(SP,AP,GP,HP),[node(S,A,G,H)|NewTail]):-
     F is G + H,
@@ -93,8 +96,7 @@ orderedInsertNode([node(S,A,G,H)|Tail],node(SP,AP,GP,HP),[node(S,A,G,H)|NewTail]
     F < FP,!,
     orderedInsertNode(Tail,node(SP,AP,GP,HP),NewTail).
 
-orderedInsertNode(List,node(S,A,G,H),[node(S,A,G,H)|List]).
-
+orderedInsertNode(List,Node,[Node|List]).
 
 getActionCost(Action,Cost):-actionCost(Action,Cost).
 getActionCost(_,1).

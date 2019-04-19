@@ -7,81 +7,6 @@ actionCost(stack(_,_),1).
 actionCost(unstack(_,_),1).
 
 
-/*
-%%%%% TEST BASE CON I PILASTRI %%%%%%
-pillar(p).
-pillar(q).
-pillar(r).
-
-block(a).
-block(b).
-block(c).
-
-initial(S):-
-	list_to_ord_set([on(a,b),on(b,c),onpillar(c,p),clear(a),clear(q),clear(r)],S).
-
-goal(G):- 
-	list_to_ord_set([on(b,a),on(a,c),onpillar(c,p),clear(b),clear(q),clear(r)],G).
-
-final(S):- goal(G), ord_subset(G,S).
-
-wrapperino(ApplicableActionsList):-
-	initial(S),
-	findall(Action,applicable(Action,S),ApplicableActionsList).
-%%%%% FINE TEST CON I PILASTRI %%%%%%
-*/
-/*
-%%%%%% TEST 1 CON I PILASTRI %%%%%%%
-
-
-block(a).
-block(b).
-block(c).
-block(d).
-block(e).
-
-pillar(p).
-pillar(q).
-pillar(r).
-
-
-initial(S):-
-	list_to_ord_set([clear(a),on(a,b),on(b,c),onpillar(c,p),clear(d),on(d,e),onpillar(e,q),clear(r)],S).
-
-goal(G):- 
-	list_to_ord_set([clear(a),on(a,b),on(b,c),on(c,d),onpillar(d,p),clear(e),onpillar(e,q),clear(r)],G).
-
-
-final(S):- goal(G), ord_subset(G,S).
-
-wrapperino(X,Y):-
-	initial(S),
-	applicable(putOnBlock(X,Y),S).
-*/
-
-
-%%%%%%%% TEST HARD COI PILASTRI %%%%%%%%%%  SOLUZIONE = 14 PASSI
-
-block(a).
-block(b).
-block(c).
-block(d).
-block(e).
-block(f).
-
-pillar(p).
-pillar(q).
-pillar(r).
-
-initial(S):-
-	list_to_ord_set([clear(a), on(a,b), on(b,c), on(c,d), onpillar(d,p), clear(e), on(e,f), onpillar(f,q), clear(r)],S).
-
-goal(G):- 
-	list_to_ord_set([clear(a), on(a,e), on(e,f), on(f,d), onpillar(d,p), clear(c), on(c,b), onpillar(b,q), clear(r)],G).
-
-final(S):- goal(G), ord_subset(G,S).
-
-
 
 /*
 %%%%%%%% TEST BASE %%%%%%%% SOLUZIONE = 8 PASSI
@@ -129,7 +54,7 @@ wrapperino(X,Y):-
 */
 
 
-/*
+
 %%%%%%%% TEST HARD %%%%%%%%%%  SOLUZIONE = 14 PASSI
 
 block(a).
@@ -147,4 +72,4 @@ goal(G):-
 
 final(S):- goal(G), ord_subset(G,S).
 
-*/
+
