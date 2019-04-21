@@ -2,7 +2,7 @@
 % test occour, then is more convenient to use ord_memberchk.
 % Otherwise, if we search for something that has a known pattern but at least one unknown
 % variable, it is useful to use member to immediately find the correct substitution (if any).
-% Aee example below:
+% See example below:
 
 belowInStack(X,Y,S):- 
 	ord_memberchk(on(Y,X),S). %example: here X and Y are known: use ord_memberchk
