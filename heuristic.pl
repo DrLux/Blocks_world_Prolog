@@ -45,7 +45,7 @@ mustBeMovedTwice(X,S,G):-
 	mustBeMovedTwice(Y,S,G).
 
 
-% goalPosition(A) = true if the block sequence from A to Table is the same in S and G
+% goalPosition(X) = true if the block sequence from X to Table is the same in S and G
 goalPosition(X,S,G):-
 	ord_memberchk(ontable(X),G),
 	ord_memberchk(ontable(X),S).

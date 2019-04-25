@@ -21,6 +21,14 @@ mustBeMovedOnce(X,S,G):-
 	member(onpillar(X,P),S),
 	member(onpillar(X,Q),G),
 	P\=Q.
+	
+mustBeMovedOnce(X,S,G):-
+	member(onpillar(X,_),S),
+	member(on(X,_),G).
+
+mustBeMovedOnce(X,S,G):-
+	member(on(X,_),S),
+	member(onpillar(X,_),G).
 
 % In theory, this case should never be reached
 mustBeMovedOnce(X,S,G):-
@@ -45,7 +53,7 @@ mustBeMovedTwice(X,S,G):-
 % goalPosition(A) = true if the block sequence from A to pillar is the same in S and G
 goalPosition(X,S,G):-
 	member(onpillar(X,P),G),
-	member(onpillar(X,P),S).
+	ord_memberchk(onpillar(X,P),S).
 
 goalPosition(X,S,G):-
 	member(on(X,Y),G),

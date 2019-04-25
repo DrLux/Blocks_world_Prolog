@@ -8,10 +8,10 @@ heuristic(S,G,Cost):-
  	write(Cost),
  	write("\n").
 
-% goalPosition(X) = true if the block sequence from X to Table is the same in S and G
+% goalPosition(X) = true if the block sequence from X to pillar is the same in S and G
 goalPosition(X,S,G):-
-	ord_memberchk(ontable(X),G),
-	ord_memberchk(ontable(X),S).
+	member(onpillar(X,P),G),
+	ord_memberchk(onpillar(X,P),S).
 
 goalPosition(X,S,G):-
 	member(on(X,Y),G),
