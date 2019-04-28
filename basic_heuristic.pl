@@ -14,6 +14,7 @@ goalPosition(X,S,G):-
 	ord_memberchk(ontable(X),S).
 
 goalPosition(X,S,G):-
+	%block(Y),
 	member(on(X,Y),G),
 	ord_memberchk(on(X,Y),S),
 	goalPosition(Y,S,G).

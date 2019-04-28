@@ -9,7 +9,11 @@ idastar(Solution):-
     goal(G),
     heuristic(S,G,HRoot),
 	idastar_aux(HRoot,Sol),
-	reverse(Sol,Solution).
+	reverse(Sol,Solution),
+    length(Solution, Cost),
+    write("\nCost Solution: "),
+    write(Cost),
+    write("\n").
 	
 idastar_aux(FLimit,RealSolution):-
     asserta(fmin(999999)),
