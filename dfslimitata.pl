@@ -1,15 +1,30 @@
 % ldfs_aux(S,ListaAzioni,Visited,Limit)
 
 idfs(MaxLimit,Step,Solution):-
-	idfs_aux(1,MaxLimit,Step,Solution).
+    asserta(exp_nodes(0)),
+    statistics(walltime, []),
+    initial(S),
+    write("\nstato initial:\n"),write(S),nl,
+    write("\nstato final:\n"),
+    goal(G),
+    write(G),nl,
+    write("\nStatistics:\n"),
+    idfs_aux(1,MaxLimit,Step,Sol),
+    reverse(Sol,Solution),
+    length(Solution, Cost),
+    write("\nCost Solution: "),
+    write(Cost),
+    statistics(walltime, [ _ | [ExecutionTime]]), %_ stand for NewTimeSinceStart
+    write('\nExecution took '), write(ExecutionTime), write(' ms.'),
+    write('\n\nSolution: '), write(Solution).
 
 idfs_aux(Limit,_,_,Solution):-
-	limited_depth_first_search(Limit,Solution),!.
+    limited_depth_first_search(Limit,Solution),!.
 
 idfs_aux(Limit,MaxLimit,Step,Solution):-
-	Limit<MaxLimit,
-	NewLimit is Limit+Step,
-	idfs_aux(NewLimit,MaxLimit,Step,Solution).
+    Limit<MaxLimit,
+    NewLimit is Limit+Step,
+    idfs_aux(NewLimit,MaxLimit,Step,Solution).
 
 
 limited_depth_first_search(Limit,Solution):-

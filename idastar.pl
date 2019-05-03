@@ -1,14 +1,25 @@
+:- dynamic exp_nodes/1.
 
 idastar(Solution):-
+    asserta(exp_nodes(0)),
+    statistics(walltime, []),
     initial(S),
+    write("\nstato initial:\n"),write(S),nl,
+    write("\nstato final:\n"),
     goal(G),
+    write(G),nl,
+    write("\nStatistics:\n"),
     heuristic(S,G,HRoot),
 	idastar_aux(HRoot,Sol),
 	reverse(Sol,Solution),
     length(Solution, Cost),
     write("\nCost Solution: "),
     write(Cost),
-    write("\n").
+    statistics(walltime, [ _ | [ExecutionTime]]), %_ stand for NewTimeSinceStart
+    write('\nExecution took '), write(ExecutionTime), write(' ms.'),
+    exp_nodes(Expanded_nodes),
+    write('\nExpanded nodes: '), write(Expanded_nodes),
+    write('\n\nSolution: '), write(Solution).
 	
 idastar_aux(FLimit,RealSolution):-
     ldfs(FLimit,FMin,Solution),
@@ -49,6 +60,9 @@ generateChildren(node(_,_,_,_),_,[],_,FMin,[]):-FMin is 999999.
 generateChildren(node(S,ActionsToS,G,H),Visited,[Action|OtherActions],FLimit,FMin,ChildrenList):-
     transform(Action,S,NewS),
     member(NewS,Visited),!,
+    exp_nodes(E),
+    New_E is E + 1,
+    asserta(exp_nodes(New_E)),
     generateChildren(node(S,ActionsToS,G,H),Visited,OtherActions,FLimit,FMin,ChildrenList).
 
 generateChildren(node(S,ActionsToS,G,H),Visited,[Action|OtherActions],FLimit,FMin,ChildrenList):-
@@ -57,6 +71,9 @@ generateChildren(node(S,ActionsToS,G,H),Visited,[Action|OtherActions],FLimit,FMi
     goal(Goal),
     heuristic(NewS,Goal,NewH),
     NewG is G + ActionCost,
+    exp_nodes(E),
+    New_E is E + 1,
+    asserta(exp_nodes(New_E)),
     generateChildren(node(S,ActionsToS,G,H),Visited,OtherActions,FLimit,FMinTail,ChildrenListTail),
     chooseToInsert(node(NewS,[Action|ActionsToS],NewG,NewH),FLimit,FMinTail,ChildrenListTail,FMin,ChildrenList).
 

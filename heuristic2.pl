@@ -122,11 +122,8 @@ replaceOnPillar(_,_,S,S).
 
 heuristic(S,G,Cost):-
     findall(X,block(X),BlockList),
- 	computeCost(BlockList,S,G,Cost),
- 	write("heuristic: "),
- 	write(Cost),
- 	write("\n").
-
+ 	computeCost(BlockList,S,G,Cost).
+ 	
 computeCost([],_,_,0).
 
 computeCost([X|Tail],S,G,Cost):-

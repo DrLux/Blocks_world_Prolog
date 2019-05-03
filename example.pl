@@ -1,10 +1,10 @@
 
 %%%%%% ACTIONS COSTS %%%%%%%%
 
-actionCost(pickup(_),1).	
-actionCost(putdown(_),1).
-actionCost(stack(_,_),1).
-actionCost(unstack(_,_),1).
+actionCost(pickup(_),16).	
+actionCost(putdown(_),3).
+actionCost(stack(_,_),3).
+actionCost(unstack(_,_),3).
 
 /*
 %%%%%%%% Esempio 1 %%%%%%%% SOLUZIONE = 8 PASSI
@@ -19,13 +19,9 @@ goal(G):-
 	list_to_ord_set([on(b,a),on(a,c),ontable(c),clear(b),handempty],G).
 
 final(S):- goal(G), ord_subset(G,S).
-
-wrapperino(ApplicableActionsList):-
-	initial(S),
-	findall(Action,applicable(Action,S),ApplicableActionsList).
 */
 
-/*
+
 %%%%%% Esempio 2 %%%%%%% SOLUZIONE: 12 passi
 block(a).
 block(b).
@@ -43,10 +39,6 @@ goal(G):- list_to_ord_set([on(a,b),on(b,c),on(c,d),ontable(d),
 
 final(S):- goal(G), ord_subset(G,S).
 
-wrapperino(X,Y):-
-	initial(S),
-	applicable(putOnBlock(X,Y),S).
-*/
 
 /*
 %%%%%%%% Esempio 3 %%%%%%%%%%  SOLUZIONE = 14 PASSI
@@ -89,7 +81,6 @@ final(S):- goal(G), ord_subset(G,S).
 */
 
 /*
-%con astar: set_prolog_flag(stack_limit, 2_147_483_648).
 %%%%%%%% Esempio 5 %%%%%%%%%%  SOLUZIONE = 22
 block(a).
 block(b).
@@ -117,8 +108,38 @@ goal(G):- list_to_ord_set([
 final(S):- goal(G), ord_subset(G,S).
 */
 
+/* ESEMPIO MALEDETTO
+%%%%%%%% Esempio 6 %%%%%%%%%%  SOLUZIONE = 18
+block(a).
+block(b).
+block(c).
+block(d).
+block(e).
+
+block(h).
+block(i).
+
+
+block(f).
+block(g).
+block(y).
+block(k).
+block(w).
+
+initial(S):- list_to_ord_set([
+	clear(a), on(a,b), on(b,c), on(c,e), on(e,d), ontable(d),
+	clear(h), on(h,g), ontable(g),
+	clear(f), on(f,i), on(i,y), on(y,k), on(k,w), ontable(w), handempty],S).
+
+goal(G):- list_to_ord_set([
+	clear(a), on(a,b), on(b,c), on(c,e), on(e,d), ontable(d),
+	clear(g), on(g,h), ontable(h),
+	clear(f), on(f,w), on(w,y), on(y,k), on(k,i), ontable(i), handempty],G).
+
+final(S):- goal(G), ord_subset(G,S).
+*/
 /*
-%%%%%%%% Esempio 6 %%%%%%%%%%  SOLUZIONE = 22
+%%%%%%%% Esempio 7 %%%%%%%%%%  SOLUZIONE = 22
 block(a).
 block(b).
 block(c).
@@ -151,7 +172,7 @@ final(S):- goal(G), ord_subset(G,S).
 */
 
 /*
-%%%%%%%% Esempio 7 %%%%%%%%%%  SOLUZIONE = 54 
+%%%%%%%% Esempio 8 %%%%%%%%%%  SOLUZIONE = 54 
 block(a).
 block(b).
 block(c).
@@ -183,8 +204,8 @@ goal(G):-
 final(S):- goal(G), ord_subset(G,S).
 */
 
-
-%%%%%%%% Esempio 8 %%%%%%%%%%  SOLUZIONE = 
+/*
+%%%%%%%% Esempio 9 %%%%%%%%%%  SOLUZIONE = 
 block(a).
 block(b).
 block(c).
@@ -223,3 +244,4 @@ goal(G):-
 	clear(y), on(y,s), on(s,l), on(l,m), on(m,t), on(t,b), on(b,v),ontable(v), handempty],G).
 
 final(S):- goal(G), ord_subset(G,S).
+*/

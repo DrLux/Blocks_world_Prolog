@@ -2,18 +2,29 @@
 % keep track of the minimum f-value found during a limited depth first search
 
 :- dynamic fmin/1.
+:- dynamic exp_nodes/2.
 
 idastar(Solution):-
     retractall(fmin(_)),
+    asserta(exp_nodes(0)),
+    statistics(walltime, []),
     initial(S),
+    write("\nstato initial:\n"),write(S),nl,
+    write("\nstato final:\n"),
     goal(G),
+    write(G),nl,
+    write("\nStatistics:\n"),
     heuristic(S,G,HRoot),
 	idastar_aux(HRoot,Sol),
 	reverse(Sol,Solution),
     length(Solution, Cost),
     write("\nCost Solution: "),
     write(Cost),
-    write("\n").
+    statistics(walltime, [ _ | [ExecutionTime]]), %_ stand for NewTimeSinceStart
+    write('\nExecution took '), write(ExecutionTime), write(' ms.'),
+    exp_nodes(Expanded_nodes),
+    write('\nExpanded nodes: '), write(Expanded_nodes),
+    write('\n\nSolution: '), write(Solution).
 	
 idastar_aux(FLimit,RealSolution):-
     asserta(fmin(999999)),
@@ -66,6 +77,9 @@ generateChildren(node(S,ActionsToS,G,H),Visited,[Action|OtherActions],FLimit,Chi
     goal(Goal),
     heuristic(NewS,Goal,NewH),
     NewG is G + ActionCost,
+    exp_nodes(E),
+    New_E is E + 1,
+    asserta(exp_nodes(New_E)),
     generateChildren(node(S,ActionsToS,G,H),Visited,OtherActions,FLimit,ChildrenListTail),
     chooseToInsert(node(NewS,[Action|ActionsToS],NewG,NewH),FLimit,ChildrenListTail,ChildrenList).
 

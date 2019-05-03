@@ -1,21 +1,36 @@
+:- dynamic exp_nodes/1.
+
 astar(Solution):-
+    asserta(exp_nodes(0)),
+    statistics(walltime, []),
     initial(S),
-    write("\nstato initial:\n"),
-    write(S),
+    write("\nstato initial:\n"),write(S),nl,
     write("\nstato final:\n"),
     goal(G),
-    write(G),
+    write(G),nl,
+    write("\nStatistics:\n"),
     astar_aux([node(S,[],0,0)],[],Sol),
-    reverse(Sol,Solution).
+    reverse(Sol,Solution),
+    statistics(walltime, [ _ | [ExecutionTime]]), %_ stand for NewTimeSinceStart
+    write('\nExecution took '), write(ExecutionTime), write(' ms.'),
+    exp_nodes(Expanded_nodes),
+    write('\nExpanded nodes: '), write(Expanded_nodes),
+    write('\n\nSolution: ').
+
+%per relazione:
+%statistics(walltime, Result) sets Result as a list, with the head being the total time since the Prolog instance was started, and the tail being a single-element list representing the time since the last statistics(walltime, _) call was made.
+
 
 % astar_aux(Coda,ClosedList,Soluzione)
 % Coda = [node(S,Azioni,G,H)|...]
 
-astar_aux([node(S,ActionsToS,G,_)|_],_,ActionsToS):-
+astar_aux([node(S,ActionsToS,G,_)| Frontier],_,ActionsToS):-
     final(S),!,
     write("\nCost Solution: "),
     write(G),
-    write("\n").
+    write("\nNodes in frontier: "),
+    length(Frontier,F), 
+    write(F).
     
 
 astar_aux([node(S,ActionsToS,G,H)|OpenTail],ClosedList,Solution):-
@@ -52,6 +67,9 @@ generateChildren(node(S,ActionsToS,G,H),[ApplicableAction|OtherActions],OpenList
     goal(Goal),
     heuristic(NewS,Goal,NewH),
     orderedInsertNode(OpenList,node(NewS,[ApplicableAction|ActionsToS],NewG,NewH),NewOpenList),
+    exp_nodes(E),
+    New_E is E + 1,
+    asserta(exp_nodes(New_E)),
     generateChildren(node(S,ActionsToS,G,H),OtherActions,NewOpenList,ClosedList,UpdatedOpenList,UpdatedClosedList).
 
 
