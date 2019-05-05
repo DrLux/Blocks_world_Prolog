@@ -1,7 +1,17 @@
 :- dynamic exp_nodes/1.
 
+init_exp_nodes :-
+    retractall(exp_nodes(_)),
+    asserta(exp_nodes(0)).
+
+inc_exp_nodes :- 
+    exp_nodes(E),
+    retractall(exp_nodes(_)),
+    NewE is E + 1,
+    asserta(exp_nodes(NewE)).
+
 idastar(Solution):-
-    asserta(exp_nodes(0)),
+    init_exp_nodes,
     statistics(walltime, []),
     initial(S),
     write("\nstato initial:\n"),write(S),nl,
@@ -32,9 +42,8 @@ idastar_choice(FMin,Solution,Solution):-
 % if not, retry with a greater max f-value (FMin)
 idastar_choice(FMin,_,Solution):-
     FMin < 999999,
-    write("retry:  "),
-    write(FMin),
-    write("\n"),
+    write("retry: "),
+    write(FMin),nl,
     idastar_aux(FMin,Solution).
     
 % f-limited depth first search 
@@ -45,7 +54,9 @@ ldfs(FLimit,FMin,Solution):-
     
 % when we find a solution, we return a min f-value of -1 so 
 % we can detect it and stop the search
-ldfs_aux(node(S,ActionsToS,_,_),_,_,-1,ActionsToS):-final(S).
+ldfs_aux(node(S,ActionsToS,_,_),_,_,FMin,ActionsToS):-
+    final(S),
+    FMin is -1.
 
 ldfs_aux(node(S,ActionsToS,G,H),Visited,FLimit,FMin,Solution):-
     findall(Action,applicable(Action,S),ApplicableActions),
@@ -60,9 +71,6 @@ generateChildren(node(_,_,_,_),_,[],_,FMin,[]):-FMin is 999999.
 generateChildren(node(S,ActionsToS,G,H),Visited,[Action|OtherActions],FLimit,FMin,ChildrenList):-
     transform(Action,S,NewS),
     member(NewS,Visited),!,
-    exp_nodes(E),
-    New_E is E + 1,
-    asserta(exp_nodes(New_E)),
     generateChildren(node(S,ActionsToS,G,H),Visited,OtherActions,FLimit,FMin,ChildrenList).
 
 generateChildren(node(S,ActionsToS,G,H),Visited,[Action|OtherActions],FLimit,FMin,ChildrenList):-
@@ -71,9 +79,7 @@ generateChildren(node(S,ActionsToS,G,H),Visited,[Action|OtherActions],FLimit,FMi
     goal(Goal),
     heuristic(NewS,Goal,NewH),
     NewG is G + ActionCost,
-    exp_nodes(E),
-    New_E is E + 1,
-    asserta(exp_nodes(New_E)),
+    inc_exp_nodes, %%%%%
     generateChildren(node(S,ActionsToS,G,H),Visited,OtherActions,FLimit,FMinTail,ChildrenListTail),
     chooseToInsert(node(NewS,[Action|ActionsToS],NewG,NewH),FLimit,FMinTail,ChildrenListTail,FMin,ChildrenList).
 

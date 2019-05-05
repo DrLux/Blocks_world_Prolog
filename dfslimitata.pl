@@ -1,7 +1,18 @@
-% ldfs_aux(S,ListaAzioni,Visited,Limit)
+
+:- dynamic exp_nodes/1.
+
+init_exp_nodes :-
+    retractall(exp_nodes(_)),
+    asserta(exp_nodes(0)).
+
+inc_exp_nodes :- 
+    exp_nodes(E),
+    retractall(exp_nodes(_)),
+    NewE is E + 1,
+    asserta(exp_nodes(NewE)).
 
 idfs(MaxLimit,Step,Solution):-
-    asserta(exp_nodes(0)),
+    init_exp_nodes,
     statistics(walltime, []),
     initial(S),
     write("\nstato initial:\n"),write(S),nl,
@@ -16,6 +27,8 @@ idfs(MaxLimit,Step,Solution):-
     write(Cost),
     statistics(walltime, [ _ | [ExecutionTime]]), %_ stand for NewTimeSinceStart
     write('\nExecution took '), write(ExecutionTime), write(' ms.'),
+    exp_nodes(Expanded_nodes),
+    write('\nExpanded nodes: '), write(Expanded_nodes),
     write('\n\nSolution: '), write(Solution).
 
 idfs_aux(Limit,_,_,Solution):-
@@ -38,5 +51,9 @@ ldfs_aux(S,Visited,Limit,[Action|ActionsTail]):-
     applicable(Action,S),
     transform(Action,S,NewS),
     \+member(NewS,Visited),
+    inc_exp_nodes,
     DecrementedLimit is Limit-1,
     ldfs_aux(NewS,[NewS|Visited],DecrementedLimit,ActionsTail).
+    
+    
+    

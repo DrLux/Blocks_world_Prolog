@@ -2,11 +2,21 @@
 % keep track of the minimum f-value found during a limited depth first search
 
 :- dynamic fmin/1.
-:- dynamic exp_nodes/2.
+:- dynamic exp_nodes/1.
 
+init_exp_nodes :-
+    retractall(exp_nodes(_)),
+    asserta(exp_nodes(0)).
+
+inc_exp_nodes :- 
+    exp_nodes(E),
+    retractall(exp_nodes(_)),
+    NewE is E + 1,
+    asserta(exp_nodes(NewE)).
+    
+    
 idastar(Solution):-
-    retractall(fmin(_)),
-    asserta(exp_nodes(0)),
+    init_exp_nodes,
     statistics(walltime, []),
     initial(S),
     write("\nstato initial:\n"),write(S),nl,
@@ -27,6 +37,7 @@ idastar(Solution):-
     write('\n\nSolution: '), write(Solution).
 	
 idastar_aux(FLimit,RealSolution):-
+    retractall(fmin(_)),
     asserta(fmin(999999)),
     ldfs(FLimit,Solution),
     idastar_choice(Solution,RealSolution).
@@ -41,8 +52,7 @@ idastar_choice(_,Solution):-
     fmin(FMin),
     FMin < 999999,
     write("retry:  "),
-    write(FMin),
-    write("\n"),
+    write(FMin),nl,
     idastar_aux(FMin,Solution).
     
 % f-limited depth first search 
@@ -77,9 +87,7 @@ generateChildren(node(S,ActionsToS,G,H),Visited,[Action|OtherActions],FLimit,Chi
     goal(Goal),
     heuristic(NewS,Goal,NewH),
     NewG is G + ActionCost,
-    exp_nodes(E),
-    New_E is E + 1,
-    asserta(exp_nodes(New_E)),
+    inc_exp_nodes, %%%%%
     generateChildren(node(S,ActionsToS,G,H),Visited,OtherActions,FLimit,ChildrenListTail),
     chooseToInsert(node(NewS,[Action|ActionsToS],NewG,NewH),FLimit,ChildrenListTail,ChildrenList).
 
@@ -116,6 +124,7 @@ exploreMoreCheck(OtherChildren,Visited,FLimit,_,Solution):-
 updateFMin(NewFMin):-
     fmin(OldFMin),
     NewFMin < OldFMin,!,
+    retractall(fmin(_)),
     asserta(fmin(NewFMin)).
 
 updateFMin(_).

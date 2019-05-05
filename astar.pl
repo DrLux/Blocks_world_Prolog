@@ -1,7 +1,18 @@
 :- dynamic exp_nodes/1.
 
+init_exp_nodes :-
+    retractall(exp_nodes(_)),
+    asserta(exp_nodes(0)).
+
+inc_exp_nodes :- 
+    exp_nodes(E),
+    retractall(exp_nodes(_)),
+    NewE is E + 1,
+    asserta(exp_nodes(NewE)).
+
+
 astar(Solution):-
-    asserta(exp_nodes(0)),
+    init_exp_nodes,
     statistics(walltime, []),
     initial(S),
     write("\nstato initial:\n"),write(S),nl,
@@ -15,10 +26,10 @@ astar(Solution):-
     write('\nExecution took '), write(ExecutionTime), write(' ms.'),
     exp_nodes(Expanded_nodes),
     write('\nExpanded nodes: '), write(Expanded_nodes),
-    write('\n\nSolution: ').
+    write('\n\nSolution: '), write(Solution).
 
-%per relazione:
-%statistics(walltime, Result) sets Result as a list, with the head being the total time since the Prolog instance was started, and the tail being a single-element list representing the time since the last statistics(walltime, _) call was made.
+% per relazione:
+% statistics(walltime, Result) sets Result as a list, with the head being the total time since the Prolog instance was started, and the tail being a single-element list representing the time since the last statistics(walltime, _) call was made.
 
 
 % astar_aux(Coda,ClosedList,Soluzione)
@@ -67,15 +78,9 @@ generateChildren(node(S,ActionsToS,G,H),[ApplicableAction|OtherActions],OpenList
     goal(Goal),
     heuristic(NewS,Goal,NewH),
     orderedInsertNode(OpenList,node(NewS,[ApplicableAction|ActionsToS],NewG,NewH),NewOpenList),
-    exp_nodes(E),
-    New_E is E + 1,
-    asserta(exp_nodes(New_E)),
+    inc_exp_nodes, %%%%%
     generateChildren(node(S,ActionsToS,G,H),OtherActions,NewOpenList,ClosedList,UpdatedOpenList,UpdatedClosedList).
-
-
-getActionCost(Action,Cost):-actionCost(Action,Cost).
-getActionCost(_,1).
-
+    
 
 updateOpenList(node(NewS,OldActions,OldG,OldH),node(NewS,NewActions,NewG,_),OpenList,NewOpenList):-
     NewG < OldG,!,
@@ -102,3 +107,8 @@ orderedInsertNode([node(S,A,G,H)|Tail],node(SP,AP,GP,HP),[node(S,A,G,H)|NewTail]
     orderedInsertNode(Tail,node(SP,AP,GP,HP),NewTail).
 
 orderedInsertNode(List,Node,[Node|List]).
+
+
+getActionCost(Action,Cost):-actionCost(Action,Cost).
+getActionCost(_,1).
+

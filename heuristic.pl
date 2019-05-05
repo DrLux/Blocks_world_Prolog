@@ -122,14 +122,14 @@ heuristic(S,G,Cost):-
 computeCost([],_,_,0).
 
 computeCost([X|Tail],S,G,Cost):-
-	mustBeMovedTwice(X,S,G),!,
-	computeCost(Tail,S,G,TailCost),
-	Cost is TailCost + 4. % if block movement consist of two phases, pickup & putdown (2 if only direct move actions are present)
-
-computeCost([X|Tail],S,G,Cost):-
 	mustBeMovedOnce(X,S,G),!,
 	computeCost(Tail,S,G,TailCost),
 	Cost is TailCost + 2. % if block movement consist of two phases, pickup & putdown (1 if only direct move actions are present)
+
+computeCost([X|Tail],S,G,Cost):-
+	mustBeMovedTwice(X,S,G),!,
+	computeCost(Tail,S,G,TailCost),
+	Cost is TailCost + 4. % if block movement consist of two phases, pickup & putdown (2 if only direct move actions are present)
 
 computeCost([_|Tail],S,G,Cost):-
 	computeCost(Tail,S,G,Cost).

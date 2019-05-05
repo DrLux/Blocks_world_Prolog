@@ -1,10 +1,19 @@
 
 %%%%%% ACTIONS COSTS %%%%%%%%
 
+
+actionCost(pickup(_),1).	
+actionCost(putdown(_),1).
+actionCost(stack(_,_),1).
+actionCost(unstack(_,_),1).
+
+
+/*
 actionCost(pickup(_),16).	
 actionCost(putdown(_),3).
 actionCost(stack(_,_),3).
 actionCost(unstack(_,_),3).
+*/
 
 /*
 %%%%%%%% Esempio 1 %%%%%%%% SOLUZIONE = 8 PASSI
@@ -21,7 +30,7 @@ goal(G):-
 final(S):- goal(G), ord_subset(G,S).
 */
 
-
+/*
 %%%%%% Esempio 2 %%%%%%% SOLUZIONE: 12 passi
 block(a).
 block(b).
@@ -38,7 +47,7 @@ goal(G):- list_to_ord_set([on(a,b),on(b,c),on(c,d),ontable(d),
 	ontable(e),clear(e)],G).
 
 final(S):- goal(G), ord_subset(G,S).
-
+*/
 
 /*
 %%%%%%%% Esempio 3 %%%%%%%%%%  SOLUZIONE = 14 PASSI
@@ -108,7 +117,8 @@ goal(G):- list_to_ord_set([
 final(S):- goal(G), ord_subset(G,S).
 */
 
-/* ESEMPIO MALEDETTO
+
+% ESEMPIO MALEDETTO
 %%%%%%%% Esempio 6 %%%%%%%%%%  SOLUZIONE = 18
 block(a).
 block(b).
@@ -137,9 +147,11 @@ goal(G):- list_to_ord_set([
 	clear(f), on(f,w), on(w,y), on(y,k), on(k,i), ontable(i), handempty],G).
 
 final(S):- goal(G), ord_subset(G,S).
-*/
+
+
+
 /*
-%%%%%%%% Esempio 7 %%%%%%%%%%  SOLUZIONE = 22
+%%%%%%%% Esempio 7 %%%%%%%%%%  SOLUZIONE = 24
 block(a).
 block(b).
 block(c).
