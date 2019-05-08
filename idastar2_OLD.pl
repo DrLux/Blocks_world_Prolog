@@ -14,6 +14,7 @@ inc_exp_nodes :-
     NewE is E + 1,
     asserta(exp_nodes(NewE)).
     
+    
 idastar(Solution):-
     init_exp_nodes,
     statistics(walltime, []),
@@ -35,13 +36,19 @@ idastar(Solution):-
     write('\nExpanded nodes: '), write(Expanded_nodes),
     write('\n\nSolution: '), write(Solution).
 	
-idastar_aux(FLimit,Solution):-
+idastar_aux(FLimit,RealSolution):-
     retractall(fmin(_)),
     asserta(fmin(999999)),
-    ldfs(FLimit,Solution).
-    
+    ldfs(FLimit,Solution),
+    idastar_choice(Solution,RealSolution).
+
+% check if a solution was found (FMin == -1)
+idastar_choice(Solution,Solution):-
+    fmin(FMin),
+    FMin < 0.
+
 % if not, retry with a greater max f-value (FMin)
-idastar_aux(_,Solution):-
+idastar_choice(_,Solution):-
     fmin(FMin),
     FMin < 999999,
     write("retry:  "),
@@ -57,11 +64,12 @@ ldfs(FLimit,Solution):-
 % when we find a solution, we return a min f-value of -1 so 
 % we can detect it and stop the search
 ldfs_aux(node(S,ActionsToS,_,_),_,_,ActionsToS):-
-    final(S).
+    final(S),
+    updateFMin(-1).
 
 ldfs_aux(node(S,ActionsToS,G,H),Visited,FLimit,Solution):-
     findall(Action,applicable(Action,S),ApplicableActions),
-    generateChildren(node(S,ActionsToS,G,H),Visited,ApplicableActions,FLimit,ChildrenList),!,
+    generateChildren(node(S,ActionsToS,G,H),Visited,ApplicableActions,FLimit,ChildrenList),
     exploreChildren(ChildrenList,Visited,FLimit,Solution).
     
 
@@ -96,14 +104,22 @@ chooseToInsert(node(_,_,G,H),_,ChildrenListIn,ChildrenListOut):-
     ChildrenListOut = ChildrenListIn.
 
 
-exploreChildren([],_,_,[]):- fail.
+exploreChildren([],_,_,[]).
 
-exploreChildren([node(S,A,G,H)|_],Visited,FLimit,Solution):-
-    ldfs_aux(node(S,A,G,H),[S|Visited],FLimit,Solution). %repeat f-limited depth search, starting from a child.
+exploreChildren([node(S,A,G,H)|OtherChildren],Visited,FLimit,Solution):-
+    ldfs_aux(node(S,A,G,H),[S|Visited],FLimit,SolutionChild), %repeat f-limited depth search, starting from a child
+    exploreMoreCheck(OtherChildren,Visited,FLimit,SolutionChild,Solution).
 
-% if no success, try another child
-exploreChildren([_|OtherChildren],Visited,FLimit,Solution):-
+% have we found a solution by doing a depth search starting from a child? If yes, stop
+exploreMoreCheck(_,_,_,SolutionIn,SolutionOut):-
+    fmin(FMin),
+    FMin < 0,!,
+    SolutionOut = SolutionIn.
+
+% otherwise, explore the remaining children
+exploreMoreCheck(OtherChildren,Visited,FLimit,_,Solution):-
     exploreChildren(OtherChildren,Visited,FLimit,Solution).
+
 
 updateFMin(NewFMin):-
     fmin(OldFMin),
