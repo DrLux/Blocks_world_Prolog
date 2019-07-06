@@ -1,6 +1,6 @@
-% Mondo dei blocchi
-% Specifica delle azioni mediante precondizioni ed effetti alla STRIPS
-% Gli stati sono rappresentati con insiemi ordinati
+% Block world transition model
+% actions specified in a STRIPS-like manner
+% states represented as ordered sets
 
 applicable(pickup(X),S):-
 	block(X),

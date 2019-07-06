@@ -4,112 +4,112 @@
 % variable, it is useful to use member to immediately find the correct substitution (if any).
 % See example below:
 
-belowInStack(X,Y,S):- 
+below_in_stack(X,Y,S):- 
 	ord_memberchk(on(Y,X),S). %example: here X and Y are known: use ord_memberchk
 
-belowInStack(X,Y,S):- 
+below_in_stack(X,Y,S):- 
 	member(on(Y,Z),S),  % here we only know the pattern, but we do not know Z: use member
-	belowInStack(X,Z,S).
+	below_in_stack(X,Z,S).
 
 
-mustBeMovedOnce(X,S,G):-
+must_be_moved_once(X,S,G):-
 	member(on(X,Y),S),
 	member(on(X,Z),G),
 	Y\=Z.
 
-mustBeMovedOnce(X,S,G):-
+must_be_moved_once(X,S,G):-
 	ord_memberchk(ontable(X),G),
 	member(on(X,_),S).
 
-mustBeMovedOnce(X,S,G):-
+must_be_moved_once(X,S,G):-
 	ord_memberchk(ontable(X),S),   
 	member(on(X,_),G).
 
 % In theory, this case should never be reached
-mustBeMovedOnce(X,S,G):-
+must_be_moved_once(X,S,G):-
 	member(on(X,Y),G),
 	\+ord_memberchk(on(X,Y),S),
-	belowInStack(Y,X,S),
-	write("\n!!!!!! - If you read this, check mustBeMovedOnce\n").
+	below_in_stack(Y,X,S),
+	write("\n!!!!!! - If you read this, check must_be_moved_once\n").
 
 
-mustBeMovedTwice(X,S,G):-
+must_be_moved_twice(X,S,G):-
 	member(on(X,Y),S),
 	ord_memberchk(on(X,Y),G),
-	mustBeMovedOnce(Y,S,G).
+	must_be_moved_once(Y,S,G).
 
-mustBeMovedTwice(X,S,G):-
+must_be_moved_twice(X,S,G):-
 	block(Y),
 	X\=Y,
-	belowInStack(Y,X,S),
-	mustBeMovedTwice(Y,S,G).
+	below_in_stack(Y,X,S),
+	must_be_moved_twice(Y,S,G).
 
 
-% goalPosition(X) = true if the block sequence from X to Table is the same in S and G
-goalPosition(X,S,G):-
+% goal_position(X) = true if the block sequence from X to Table is the same in S and G
+goal_position(X,S,G):-
 	ord_memberchk(ontable(X),G),
 	ord_memberchk(ontable(X),S).
 
-goalPosition(X,S,G):-
+goal_position(X,S,G):-
 	member(on(X,Y),G),
 	ord_memberchk(on(X,Y),S),
-	goalPosition(Y,S,G).
+	goal_position(Y,S,G).
 
 
-% mutualPrevention(A,B) = if A and B are swapped, both reach their goal positions (tested in a fake state)
-mutualPrevention(X,Y,S,G):-
+% mutual_prevention(A,B) = if A and B are swapped, both reach their goal positions (tested in a fake state)
+mutual_prevention(X,Y,S,G):-
     %ord_memberchk(clear(X),S),
     %ord_memberchk(clear(Y),S),
-	swapBlocks(X,Y,S,FAKE_S),
-	goalPosition(X,FAKE_S,G),
-	goalPosition(Y,FAKE_S,G).
+	swap_blocks(X,Y,S,FAKE_S),
+	goal_position(X,FAKE_S,G),
+	goal_position(Y,FAKE_S,G).
 
-swapBlocks(X,Y,S,FAKE_S):-
-	replaceBlock(X,Y,S,SP),
-	replaceBlock(Y,X,S,SPP),
+swap_blocks(X,Y,S,FAKE_S):-
+	replace_block(X,Y,S,SP),
+	replace_block(Y,X,S,SPP),
 	ord_union(SP, SPP, FAKE_S).
 
-replaceBlock(X,Y,S,SP):-
-	replaceAbove(X,Y,S,SA),
-	replaceBelow(X,Y,S,SB),
+replace_block(X,Y,S,SP):-
+	replace_above(X,Y,S,SA),
+	replace_below(X,Y,S,SB),
 	ord_union(SA,SB,FAKE_S),
-	replaceOnTable(X,Y,FAKE_S,SP).
+	replace_ontable(X,Y,FAKE_S,SP).
 
 
-replaceAbove(X,Y,S,SPP):- % if there is a block that is not Y above X
+replace_above(X,Y,S,SPP):- % if there is a block that is not Y above X
 	member(on(Z,X),S),
 	Y\=Z,!, 
 	ord_del_element(S,on(Z,X),SP),
 	ord_add_element(SP,on(Z,Y),SPP).
 
-replaceAbove(X,Y,S,SPP):- % if block Y is above X
+replace_above(X,Y,S,SPP):- % if block Y is above X
 	ord_memberchk(on(Y,X),S),!,
 	ord_del_element(S,on(Y,X),SP),
 	ord_add_element(SP,on(X,Y),SPP).
 
-replaceAbove(_,_,S,S). % if there is no block above X
+replace_above(_,_,S,S). % if there is no block above X
 
 
-replaceBelow(X,Y,S,SPP):-  % if there is a block that is not Y below X
+replace_below(X,Y,S,SPP):-  % if there is a block that is not Y below X
 	member(on(X,Z),S),
 	Y\=Z,!, 
 	ord_del_element(S,on(X,Z),SP),
 	ord_add_element(SP,on(Y,Z),SPP).
 
-replaceBelow(X,Y,S,SPP):- % if block Y is below X
+replace_below(X,Y,S,SPP):- % if block Y is below X
 	ord_memberchk(on(X,Y),S),!,
 	ord_del_element(S,on(X,Y),SP),
 	ord_add_element(SP,on(Y,X),SPP).
 
-replaceBelow(_,_,S,S). % if there is no block below X
+replace_below(_,_,S,S). % if there is no block below X
 
 
-replaceOnTable(X,Y,S,ST):-
+replace_ontable(X,Y,S,ST):-
 	ord_memberchk(ontable(X),S),!,
 	ord_del_element(S,ontable(X),SP),
 	ord_add_element(SP,ontable(Y),ST).
 
-replaceOnTable(_,_,S,S).
+replace_ontable(_,_,S,S).
 
 
 %####################################
@@ -117,20 +117,20 @@ replaceOnTable(_,_,S,S).
 
 heuristic(S,G,Cost):-
     findall(X,block(X),BlockList),
- 	computeCost(BlockList,S,G,Cost).
+ 	compute_cost(BlockList,S,G,Cost).
 
-computeCost([],_,_,0).
+compute_cost([],_,_,0).
 
-computeCost([X|Tail],S,G,Cost):-
-	mustBeMovedOnce(X,S,G),!,
-	computeCost(Tail,S,G,TailCost),
+compute_cost([X|Tail],S,G,Cost):-
+	must_be_moved_once(X,S,G),!,
+	compute_cost(Tail,S,G,TailCost),
 	Cost is TailCost + 2. % if block movement consist of two phases, pickup & putdown (1 if only direct move actions are present)
 
-computeCost([X|Tail],S,G,Cost):-
-	mustBeMovedTwice(X,S,G),!,
-	computeCost(Tail,S,G,TailCost),
+compute_cost([X|Tail],S,G,Cost):-
+	must_be_moved_twice(X,S,G),!,
+	compute_cost(Tail,S,G,TailCost),
 	Cost is TailCost + 4. % if block movement consist of two phases, pickup & putdown (2 if only direct move actions are present)
 
-computeCost([_|Tail],S,G,Cost):-
-	computeCost(Tail,S,G,Cost).
+compute_cost([_|Tail],S,G,Cost):-
+	compute_cost(Tail,S,G,Cost).
 

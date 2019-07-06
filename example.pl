@@ -2,17 +2,17 @@
 %%%%%% ACTIONS COSTS %%%%%%%%
 
 
-actionCost(pickup(_),1).	
-actionCost(putdown(_),1).
-actionCost(stack(_,_),1).
-actionCost(unstack(_,_),1).
+action_cost(pickup(_),1).	
+action_cost(putdown(_),1).
+action_cost(stack(_,_),1).
+action_cost(unstack(_,_),1).
 
 
 /*
-actionCost(pickup(_),16).	
-actionCost(putdown(_),3).
-actionCost(stack(_,_),3).
-actionCost(unstack(_,_),3).
+action_cost(pickup(_),1).	
+action_cost(putdown(_),4).
+action_cost(stack(_,_),1).
+action_cost(unstack(_,_),1).
 */
 
 /*
@@ -118,7 +118,6 @@ final(S):- goal(G), ord_subset(G,S).
 */
 
 
-% ESEMPIO MALEDETTO
 %%%%%%%% Esempio 6 %%%%%%%%%%  SOLUZIONE = 18
 block(a).
 block(b).
@@ -184,7 +183,7 @@ final(S):- goal(G), ord_subset(G,S).
 */
 
 /*
-%%%%%%%% Esempio 8 %%%%%%%%%%  SOLUZIONE = 54 
+%%%%%%%% Esempio 8 %%%%%%%%%%  SOLUZIONE > 46 
 block(a).
 block(b).
 block(c).
@@ -217,7 +216,7 @@ final(S):- goal(G), ord_subset(G,S).
 */
 
 /*
-%%%%%%%% Esempio 9 %%%%%%%%%%  SOLUZIONE = 
+%%%%%%%% Esempio 9 %%%%%%%%%%  SOLUZIONE = ?
 block(a).
 block(b).
 block(c).
